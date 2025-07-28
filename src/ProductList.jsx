@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './ProductList.css';
 import CartItem from './CartItem';
-import { addItem } from './CartSlice';
+import { addItem, removeItem } from './CartSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 function ProductList({ onGoBackHome }) {
@@ -274,6 +274,7 @@ function ProductList({ onGoBackHome }) {
     const newCart = { ...addedToCart };
     delete newCart[plant.name];
     setAddedToCart(newCart);
+    dispatch(removeItem(plant)); // This line fixes the delete functionality
   };
 
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
