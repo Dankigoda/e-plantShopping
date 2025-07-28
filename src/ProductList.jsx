@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from 'react-redux';
 function ProductList({ onGoBackHome }) {
   const [showCart, setShowCart] = useState(false);
   const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-  const [addedToCart, setAddedToCart] = useState({}); // State to control the items added to the cart
   const cart = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
 
@@ -266,14 +265,7 @@ function ProductList({ onGoBackHome }) {
   };
 
   const handleAddToCart = (plant) => {
-    setAddedToCart({ ...addedToCart, [plant.name]: true }); // Add the selected plant to the cart
     dispatch(addItem(plant));
-  };
-
-  const handleRemoveFromCart = (plant) => {
-    const newCart = { ...addedToCart };
-    delete newCart[plant.name];
-    setAddedToCart(newCart);
   };
 
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
@@ -338,17 +330,17 @@ function ProductList({ onGoBackHome }) {
               </h1>
               <div className="product-list">
                 {category.plants.map((plant, plantIndex) => (
-                  <div key={plantIndex} className="product-card">
+                  <div key={plant.name + plantIndex} className="product-card">
                     <p className="product-title">{plant.name}</p>
                     <img src={plant.image} alt={plant.name} className="product-image" />
                     <p className="product-price">{plant.cost}</p>
                     <p className="product-description">{plant.description}</p>
                     <button
-                      className={`product-button ${addedToCart[plant.name] ? 'added-to-cart' : ''}`}
-                      disabled={addedToCart[plant.name]}
+                      className={`product-button ${cart.some(item => item.name === plant.name) ? 'added-to-cart' : ''}`}
+                      disabled={cart.some(item => item.name === plant.name)}
                       onClick={() => handleAddToCart(plant)}
                     >
-                      {addedToCart[plant.name] ? 'Added to Cart' : 'Add to Cart'}
+                      {cart.some(item => item.name === plant.name) ? 'Added to Cart' : 'Add to Cart'}
                     </button>
                   </div>
                 ))}
@@ -359,7 +351,6 @@ function ProductList({ onGoBackHome }) {
       ) : (
         <CartItem
           onContinueShopping={handleContinueShopping}
-          onRemoveFromCart={handleRemoveFromCart}
         />
       )}
     </div>
