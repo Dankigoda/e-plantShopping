@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 function ProductList({ onGoBackHome }) {
   const [showCart, setShowCart] = useState(false);
   const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+  const [addedToCart, setAddedToCart] = useState({}); // State to control the items added to the cart
   const cart = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
 
@@ -265,7 +266,14 @@ function ProductList({ onGoBackHome }) {
   };
 
   const handleAddToCart = (plant) => {
+    setAddedToCart({ ...addedToCart, [plant.name]: true }); // Add the selected plant to the cart
     dispatch(addItem(plant));
+  };
+
+  const handleRemoveFromCart = (plant) => {
+    const newCart = { ...addedToCart };
+    delete newCart[plant.name];
+    setAddedToCart(newCart);
   };
 
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
@@ -336,11 +344,11 @@ function ProductList({ onGoBackHome }) {
                     <p className="product-price">{plant.cost}</p>
                     <p className="product-description">{plant.description}</p>
                     <button
-                      className={`product-button ${cart.some(item => item.name === plant.name) ? 'added-to-cart' : ''}`}
-                      disabled={cart.some(item => item.name === plant.name)}
+                      className={`product-button ${addedToCart[plant.name] ? 'added-to-cart' : ''}`}
+                      disabled={addedToCart[plant.name]}
                       onClick={() => handleAddToCart(plant)}
                     >
-                      {cart.some(item => item.name === plant.name) ? 'Added to Cart' : 'Add to Cart'}
+                      {addedToCart[plant.name] ? 'Added to Cart' : 'Add to Cart'}
                     </button>
                   </div>
                 ))}
@@ -351,6 +359,7 @@ function ProductList({ onGoBackHome }) {
       ) : (
         <CartItem
           onContinueShopping={handleContinueShopping}
+          onRemoveFromCart={handleRemoveFromCart}
         />
       )}
     </div>
